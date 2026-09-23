@@ -138,7 +138,7 @@ function RecommendMode({ speech, autoSpeak }: { speech: Speech; autoSpeak: boole
       setError(
         e instanceof DOMException && e.name === 'NotAllowedError'
           ? 'Permiso de micrófono denegado. Puedes escribir tu consulta abajo.'
-          : 'No se pudo iniciar la llamada de voz. Puedes escribir tu consulta abajo.',
+          : `No se pudo iniciar la llamada de voz${e instanceof Error ? ` (${e.message})` : ''}. Puedes escribir tu consulta abajo.`,
       )
     }
   }

@@ -15,9 +15,20 @@ npm install
 npm run dev
 ```
 
-La API key **nunca llega al navegador**: `GEMINI_API_KEY` (sin prefijo `VITE_`) solo la lee el proxy de Vite
-(`vite.config.ts`), que la inyecta en `/api/gemini` (REST) y `/api/live` (WebSocket).
-Para producción necesitas un backend equivalente a ese proxy (o tokens efímeros de la Live API).
+La API key **nunca llega al navegador**: `GEMINI_API_KEY` (sin prefijo `VITE_`) solo la usan las funciones de `api/`:
+
+- `api/gemini/[model].ts` — reenvía `generateContent` (reporte y chat) añadiendo la key.
+- `api/live-token.ts` — crea un **token efímero** de un solo uso para la Live API; el navegador se conecta directo a Google por WebSocket con ese token.
+
+En desarrollo, `vite.config.ts` monta esas mismas funciones, así que `npm run dev` se comporta igual que Vercel.
+
+## Deploy en Vercel
+
+1. Sube el repo a GitHub e impórtalo en [vercel.com/new](https://vercel.com/new) (detecta Vite; `vercel.json` ya define build, salida y rutas).
+2. En **Settings → Environment Variables** agrega `GEMINI_API_KEY` (obligatoria). Las `VITE_*` son opcionales: si no las pones se usan los valores por defecto.
+3. Deploy. O desde la terminal: `npx vercel` (preview) y `npx vercel --prod`.
+
+> El micrófono requiere HTTPS: funciona en el dominio `*.vercel.app` y en `localhost`.
 
 | Variable | Uso |
 |---|---|

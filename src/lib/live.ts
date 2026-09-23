@@ -1,5 +1,6 @@
 // Sesión voz-a-voz en tiempo real con la Live API de Gemini (WebSocket).
-// El navegador se conecta a /api/live y el proxy de Vite añade la API key.
+// El servidor (/api/live-token) crea un token efímero de un solo uso y el navegador
+// se conecta directamente a Google con él: la API key nunca sale del servidor.
 import { COURSES } from '../data/courses'
 import { RECRUITER_PROMPT } from './recommend'
 
@@ -95,8 +96,14 @@ export class LiveSession {
     this.micCtx = new AudioContext()
     await this.micCtx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: 'application/javascript' })))
 
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws'
-    this.ws = new WebSocket(`${proto}://${location.host}/api/live`)
+    const tokenRes = await fetch('/api/live-token', { method: 'POST' })
+    const { token, error } = await tokenRes.json().catch(() => ({}))
+    if (!tokenRes.ok || !token) throw new Error(error?.message ?? 'No se pudo obtener el token de voz.')
+    if (this.closed) return
+
+    this.ws = new WebSocket(
+      `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${encodeURIComponent(token)}`,
+    )
     this.ws.onopen = () => this.sendSetup()
     this.ws.onmessage = (e) => this.onMessage(e)
     this.ws.onerror = () => this.cb.onError('No se pudo conectar con Gemini Live.')
