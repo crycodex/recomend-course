@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, sans-serif;
+
+  --color-iris-50: #f3f0ff;
+  --color-iris-100: #e7e1ff;
+  --color-iris-200: #cfc3ff;
+  --color-iris-300: #ae98ff;
+  --color-iris-400: #8a66ff;
+  --color-iris-500: #6f45fb;
+  --color-iris-600: #5b3df5;
+  --color-iris-700: #4a2bd6;
+  --color-iris-800: #3b24aa;
+  --color-iris-900: #2a1b78;
+
+  --color-lime-accent: #c6f432;
+
+  --animate-pulse-ring: pulse-ring 1.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+  @keyframes pulse-ring {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+}
+
+html { scroll-behavior: smooth; }
+body {
+  @apply bg-stone-50 text-stone-900 antialiased dark:bg-[#0e0c16] dark:text-stone-100;
+  transition: background-color .2s, color .2s;
+}
